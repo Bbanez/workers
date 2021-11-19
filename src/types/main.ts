@@ -2,7 +2,7 @@ import type { WorkerError } from './error';
 import type { WorkerResult } from './result';
 
 export interface WorkerFunction<Output> {
-  (): Promise<Output>;
+  (workerId: string): Promise<Output>;
 }
 
 export interface WorkerManager {

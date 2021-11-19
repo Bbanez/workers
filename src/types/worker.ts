@@ -6,7 +6,7 @@ export class Worker {
   public queue = createQueue();
 
   constructor(
-    public name: string,
+    public id: string,
     public getTask: () => WorkerTask | undefined,
     public onFree: () => void,
   ) {}
@@ -15,13 +15,13 @@ export class Worker {
     if (task) {
       this.busy = true;
       this.queue({
-        name: this.name,
+        name: this.id,
         handler: async () => {
           try {
-            const result = await task.fn();
-            task.onDone(result, this.name);
+            const result = await task.fn(this.id);
+            task.onDone(result, this.id);
           } catch (error) {
-            task.onError(error, this.name);
+            task.onError(error, this.id);
           }
           this.busy = false;
           this.onFree();
