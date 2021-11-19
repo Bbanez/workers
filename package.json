@@ -1,6 +1,6 @@
 {
   "name": "@banez/workers",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Package which will execute async function with workers.",
   "author": "Branislav Vajagić",
   "license": "MIT",
