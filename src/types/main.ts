@@ -9,6 +9,8 @@ export interface WorkerManager {
   assign<Output>(
     fn: WorkerFunction<Output>,
   ): Promise<WorkerResult<Output> | WorkerError>;
+  isWorking(): boolean;
+  wait(): Promise<void>
 }
 
 export interface WorkerTask {

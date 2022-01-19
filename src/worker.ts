@@ -1,5 +1,5 @@
 import { createQueue } from '@banez/queue';
-import type { WorkerTask } from '.';
+import type { WorkerTask } from './types';
 
 export class Worker {
   public busy = false;

@@ -1,5 +1,5 @@
+import { Worker } from './worker';
 import {
-  Worker,
   WorkerError,
   WorkerFunction,
   WorkerManager,
@@ -7,7 +7,11 @@ import {
   WorkerTask,
 } from './types';
 
-export function createWorkerManager({ count }: { count: number }): WorkerManager {
+export function createWorkerManager({
+  count,
+}: {
+  count: number;
+}): WorkerManager {
   const workers: Worker[] = [];
   const tasks: WorkerTask[] = [];
   for (let i = 0; i < count; i++) {
@@ -19,11 +23,17 @@ export function createWorkerManager({ count }: { count: number }): WorkerManager
       () => {
         if (tasks.length > 0) {
           worker.run(tasks.pop());
+        } else {
+          for (let j = 0; j < awaiters.length; j++) {
+            const awaiter = awaiters[j];
+            awaiter();
+          }
         }
       },
     );
     workers.push(worker);
   }
+  const awaiters: Array<() => void> = [];
 
   function runWorkers() {
     if (tasks.length > 0) {
@@ -37,6 +47,16 @@ export function createWorkerManager({ count }: { count: number }): WorkerManager
   }
 
   return {
+    isWorking() {
+      return tasks.length > 0;
+    },
+    async wait() {
+      if (tasks.length > 0) {
+        await new Promise<void>((resolve) => {
+          awaiters.push(resolve);
+        });
+      }
+    },
     async assign<Output>(fn: WorkerFunction<Output>) {
       return new Promise<WorkerResult<Output> | WorkerError>((resolve) => {
         tasks.push({
