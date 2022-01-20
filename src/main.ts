@@ -23,7 +23,7 @@ export function createWorkerManager({
       () => {
         if (tasks.length > 0) {
           worker.run(tasks.pop());
-        } else {
+        } else if (!workers.find((e) => e.busy)) {
           for (let j = 0; j < awaiters.length; j++) {
             const awaiter = awaiters[j];
             awaiter();
@@ -48,11 +48,11 @@ export function createWorkerManager({
 
   return {
     isWorking() {
-      return tasks.length > 0;
+      return !!workers.find((e) => e.busy);
     },
     async wait() {
-      if (tasks.length > 0) {
-        await new Promise<void>((resolve) => {
+      if (workers.find((e) => e.busy)) {
+        return await new Promise<void>((resolve) => {
           awaiters.push(resolve);
         });
       }
